@@ -87,6 +87,9 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.debounce', 'ui.bootstrap
 
     var showHint = originalScope.$eval(attrs.typeaheadShowHint) || false;
 
+    //always show results on focus of input element, regardless of minimum length
+    var showResultsOnFocus = attrs.typeaheadShowResultsOnFocus ? originalScope.$eval(attrs.typeaheadShowResultsOnFocus) : false;
+
     //INTERNAL VARIABLES
 
     //model setter executed upon match selection
@@ -432,7 +435,7 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.debounce', 'ui.bootstrap
 
     element.on('focus', function (evt) {
       hasFocus = true;
-      if (minLength === 0 && !modelCtrl.$viewValue) {
+      if (minLength === 0 && !modelCtrl.$viewValue || showResultsOnFocus) {
         $timeout(function() {
           getMatchesAsync(modelCtrl.$viewValue, evt);
         }, 0);
