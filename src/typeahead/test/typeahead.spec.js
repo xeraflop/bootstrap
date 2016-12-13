@@ -1522,25 +1522,26 @@ describe('typeahead tests', function() {
   });
 
   describe('showResultsOnFocus set to true', function() {
-    it('should open typeahead when input is focused and input is empty string', function() {
-      var element = prepareInputEl('<div><input ng-model="result" uib-typeahead="item for item in source | filter:$viewValue" typeahead-show-results-on-focus="true"></div>');
+    it('should open typeahead when input is focused and input is set and longer than min length threshold', function() {
+      var element = prepareInputEl('<div><input ng-model="result" uib-typeahead="item for item in source | filter:$viewValue" typeahead-min-length="1" typeahead-show-results-on-focus="true"></div>');
       var inputEl = findInput(element);
-      changeInputValueTo(element, '');
+      changeInputValueTo(element, 'ba');
       inputEl.focus();
       $timeout.flush();
       $scope.$digest();
       expect(element).toBeOpenWithActive(3, 0);
     });
 
-    it('should open typeahead when input is focused and input is not empty string', function() {
-      var element = prepareInputEl('<div><input ng-model="result" uib-typeahead="item for item in source | filter:$viewValue" typeahead-show-results-on-focus="true"></div>');
+    it('should not open typeahead when input is focused and input is set and not longer than min length threshold', function() {
+      var element = prepareInputEl('<div><input ng-model="result" uib-typeahead="item for item in source | filter:$viewValue" typeahead-min-length="2" typeahead-show-results-on-focus="true"></div>');
       var inputEl = findInput(element);
       changeInputValueTo(element, 'b');
       inputEl.focus();
       $timeout.flush();
       $scope.$digest();
-      expect(element).toBeOpenWithActive(2, 0);
+      expect(element).toBeClosed();
     });
+
   });
 
   describe('event listeners', function() {
