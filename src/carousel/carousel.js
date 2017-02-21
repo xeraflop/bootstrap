@@ -44,7 +44,9 @@ angular.module('ui.bootstrap.carousel', [])
 
   self.next = $scope.next = function() {
     var newIndex = (self.getCurrentIndex() + 1) % slides.length;
-
+    if (typeof $scope.$parent.setActive === 'function') {
+      $scope.$parent.setActive(newIndex); // required to make thumbnails highlighting work
+    }
     if (newIndex === 0 && $scope.noWrap()) {
       $scope.pause();
       return;
@@ -55,7 +57,9 @@ angular.module('ui.bootstrap.carousel', [])
 
   self.prev = $scope.prev = function() {
     var newIndex = self.getCurrentIndex() - 1 < 0 ? slides.length - 1 : self.getCurrentIndex() - 1;
-
+    if (typeof $scope.$parent.setActive === 'function') {
+      $scope.$parent.setActive(newIndex); // required to make thumbnails highlighting work
+    }
     if ($scope.noWrap() && newIndex === slides.length - 1) {
       $scope.pause();
       return;
@@ -107,6 +111,25 @@ angular.module('ui.bootstrap.carousel', [])
     }
   };
 
+  // required to make image switch when thumbnail clicked
+  $scope.$parent.$watch('active', function(index) {
+    if (angular.isNumber(index) && currentIndex !== index) {
+      for (var i = 0; i < slides.length; i++) {
+        if (slides[i].slide.index === index) {
+          index = i;
+          break;
+        }
+      }
+
+      var slide = slides[index];
+      if (slide) {
+        setActive(index);
+        self.select(slides[index]);
+        currentIndex = index;
+      }
+    }
+  });
+
   /* Allow outside people to call indexOf on slides array */
   $scope.indexOfSlide = function(slide) {
     return +slide.slide.index;
@@ -142,6 +165,9 @@ angular.module('ui.bootstrap.carousel', [])
   $element.on('mouseleave', $scope.play);
 
   $scope.$on('$destroy', function() {
+    if (typeof $scope.$parent.setActive === 'function') {
+      $scope.$parent.setActive(0); // resets thumbnail active index back to zero
+    }
     destroyed = true;
     resetTimer();
   });
