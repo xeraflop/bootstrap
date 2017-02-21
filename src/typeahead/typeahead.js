@@ -435,7 +435,8 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.debounce', 'ui.bootstrap
 
     element.on('focus', function (evt) {
       hasFocus = true;
-      if (minLength === 0 && !modelCtrl.$viewValue || showResultsOnFocus) {
+      if (minLength === 0 && !modelCtrl.$viewValue ||
+          showResultsOnFocus && modelCtrl.$viewValue && modelCtrl.$viewValue.length >= minLength) {
         $timeout(function() {
           getMatchesAsync(modelCtrl.$viewValue, evt);
         }, 0);
